@@ -1,0 +1,1 @@
+/opt/lceda-pro/lceda-pro --no-sandbox --disable-dev-shm-usage --gtk-version=3

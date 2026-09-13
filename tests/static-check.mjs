@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const server = fs.readFileSync(new URL('../content/easyeda-mcp/server.mjs', import.meta.url), 'utf8');
+const manifest = fs.readFileSync(new URL('../lzc-manifest.yml', import.meta.url), 'utf8');
+const provider = fs.readFileSync(new URL('../resources/mcp-providers/default/mcp.yml', import.meta.url), 'utf8');
+assert.match(server, /EASYEDA_ALLOW_RAW_EXECUTE/);
+assert.match(server, /if \(ALLOW_RAW\)/);
+assert.match(manifest, /EASYEDA_ALLOW_RAW_EXECUTE=false/);
+assert.match(manifest, /@sha256:[0-9a-f]{64}/);
+assert.doesNotMatch(manifest, /public_path:[\s\S]*?- \/mcp/);
+assert.equal(provider.trim(), 'endpoint: /mcp');
+console.log('static security and packaging checks: PASS');

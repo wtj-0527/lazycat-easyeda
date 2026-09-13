@@ -1,0 +1,41 @@
+usage: |
+  嘉立创EDA专业版通过浏览器远程桌面运行。首次使用请登录嘉立创账号，并在扩展管理器中安装/启用官方 Run API Gateway、勾选“允许外部交互”。
+  工程、登录状态与设置保存在 /config。MCP 端点仅供应用间调用。
+application:
+  subdomain: easyeda
+  multi_instance: true
+  gpu_accel: true
+  upstreams:
+    - location: /mcp
+      backend: http://easyeda:8000/
+      disable_auto_health_checking: true
+    - location: /healthz
+      backend: http://easyeda:8000/healthz
+      disable_auto_health_checking: true
+    - location: /
+      backend: http://easyeda:3000/
+services:
+  easyeda:
+    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:17cd88de12105031d8b6012f243df481df91bde4653c5a97492357e55eb9ffa2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - LC_ALL=zh_CN.UTF-8
+      - TITLE=嘉立创EDA专业版
+      - AUTO_GPU=true
+      - SELKIES_IS_MANUAL_RESOLUTION_MODE=false|locked
+      - SELKIES_USE_CSS_SCALING=true|locked
+      - EASYEDA_BRIDGE_URL=http://127.0.0.1:49620
+      - EASYEDA_MCP_HOST=0.0.0.0
+      - EASYEDA_MCP_PORT=8000
+      - EASYEDA_ALLOW_RAW_EXECUTE=false
+    shm_size: 2g
+    binds:
+      - /lzcapp/var/config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/ >/dev/null && curl -fsS http://127.0.0.1:8000/healthz >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 180s

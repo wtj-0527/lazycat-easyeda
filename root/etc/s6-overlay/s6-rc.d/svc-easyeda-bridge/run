@@ -1,0 +1,2 @@
+#!/usr/bin/with-contenv bash
+exec s6-setuidgid abc node /opt/easyeda-api-skill/scripts/bridge-server.mjs

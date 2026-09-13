@@ -1,0 +1,6 @@
+.git
+.github
+dist
+licenses/LCEDA-EULA.pdf
+tests
+*.lpk

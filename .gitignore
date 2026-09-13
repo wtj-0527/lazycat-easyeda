@@ -1,0 +1,5 @@
+dist/*.lpk
+dist/*.sha256
+node_modules/
+.env
+*.log

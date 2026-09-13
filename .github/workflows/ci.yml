@@ -1,0 +1,20 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: content/easyeda-mcp/package-lock.json
+      - run: npm ci --prefix content/easyeda-mcp
+      - run: node --check content/easyeda-mcp/server.mjs
+      - run: node tests/static-check.mjs
+      - run: npm audit --omit=dev --audit-level=high --prefix content/easyeda-mcp

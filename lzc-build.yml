@@ -1,0 +1,8 @@
+buildscript: sh build.sh
+manifest: ./lzc-manifest.yml
+contentdir: ./content
+pkgout: ./dist
+icon: ./lzc-icon.png
+resource_exports:
+  - kind: mcp-providers
+    source: ./resources/mcp-providers
