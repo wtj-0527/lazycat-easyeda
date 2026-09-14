@@ -6,6 +6,12 @@ application:
   multi_instance: true
   gpu_accel: true
   upstreams:
+    - location: /setup/activation
+      backend: http://easyeda:8000/setup/activation
+      disable_auto_health_checking: true
+    - location: /setup
+      backend: http://easyeda:8000/setup
+      disable_auto_health_checking: true
     - location: /mcp
       backend: http://easyeda:8000/
       disable_auto_health_checking: true
@@ -16,7 +22,7 @@ application:
       backend: http://easyeda:3000/
 services:
   easyeda:
-    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:17cd88de12105031d8b6012f243df481df91bde4653c5a97492357e55eb9ffa2
+    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:761cf10335c049e578eb3a3516d7ec3ac84856630cec6a1c4b0def6cf7cb2a8a
     environment:
       - PUID=1000
       - PGID=1000

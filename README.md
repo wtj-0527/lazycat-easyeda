@@ -26,7 +26,7 @@ second computer or a reverse connector.
 
 ## First start
 
-1. Open the installed app in a browser.
+1. Open the installed app in a browser. For activation, open `/setup` in the same external browser, e.g. `https://easyeda.example.com/setup`.
 2. Accept the vendor EULA and obtain/import the **official free activation file**
    when prompted. Activation is never bypassed by this project.
 3. Sign in to EasyEDA if required.
@@ -106,9 +106,9 @@ docker exec -e MCP_URL=http://127.0.0.1:8000/mcp easyeda-test \
 
 ```bash
 lzc-cli project lint .
-lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-v0.1.0.lpk
-lzc-cli lpk info dist/community.lazycat.app.easyeda-pro-v0.1.0.lpk
-lzc-cli lpk lint dist/community.lazycat.app.easyeda-pro-v0.1.0.lpk
+lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-v0.1.1.lpk
+lzc-cli lpk info dist/community.lazycat.app.easyeda-pro-v0.1.1.lpk
+lzc-cli lpk lint dist/community.lazycat.app.easyeda-pro-v0.1.1.lpk
 ```
 
 ## Licensing

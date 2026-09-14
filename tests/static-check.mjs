@@ -7,6 +7,7 @@ assert.match(server, /EASYEDA_ALLOW_RAW_EXECUTE/);
 assert.match(server, /if \(ALLOW_RAW\)/);
 assert.match(manifest, /EASYEDA_ALLOW_RAW_EXECUTE=false/);
 assert.match(manifest, /@sha256:[0-9a-f]{64}/);
-assert.doesNotMatch(manifest, /public_path:[\s\S]*?- \/mcp/);
+assert.doesNotMatch(manifest, /public_path:/);
+assert.match(manifest, /location: \/setup/);
 assert.equal(provider.trim(), 'endpoint: /mcp');
 console.log('static security and packaging checks: PASS');
