@@ -1,118 +1,65 @@
-# EasyEDA Pro for LazyCat Microserver
+# EasyEDA Pro Online for LazyCat Microserver
 
-An all-in-one LazyCat LPK for running **嘉立创EDA专业版 / EasyEDA Pro** in a
-browser desktop and exposing a constrained, standard Streamable HTTP MCP endpoint
-to Hermes Studio.
+An all-in-one LazyCat LPK that opens the official **嘉立创EDA专业版在线编辑器**
+in an isolated Chromium browser desktop and exposes a constrained Streamable
+HTTP MCP endpoint to Hermes Studio.
 
-> Independent community packaging. EasyEDA/JLCEDA is a product of Shenzhen JLC
-> Technology Group. This project is not an official LazyCat or JLCEDA release.
+> Independent community packaging. EasyEDA/JLCEDA is a product and online
+> service of Shenzhen JLC Technology Group. This is not an official LazyCat or
+> JLCEDA release.
 
 ## Architecture
 
 ```text
-Browser ── authenticated LazyCat route ──> Selkies desktop ──> EasyEDA Pro Linux
-                                                              │
-                                                              │ official extension
-                                                              ▼
-Hermes Studio ── POST /mcp ──> constrained MCP adapter ──> official API bridge
-                                                              ▲
-                                                              │ localhost WebSocket
-                                                     Run API Gateway
+Browser ── LazyCat authenticated route ──> Selkies Chromium desktop
+                                             └─ pro.lceda.cn/editor
+                                                  ↕ Run API Gateway
+Hermes Studio ── POST /mcp ──> constrained MCP ──> official local Bridge
 ```
 
-EasyEDA Pro, the official API bridge, and the MCP adapter run in the same
-container so the official Gateway's localhost-only discovery works without a
-second computer or a reverse connector.
+Chromium, the official Bridge, and MCP run in one container, so the online
+editor's Run API Gateway can reach `127.0.0.1:49620` without another computer.
+No EasyEDA desktop binary or activation flow is included.
 
 ## First start
 
-1. Open the installed app in a browser. For activation, open `/setup` in the same external browser, e.g. `https://easyeda.example.com/setup`.
-2. Accept the vendor EULA and obtain/import the **official free activation file**
-   when prompted. Activation is never bypassed by this project.
-3. Sign in to EasyEDA if required.
-4. Install `Run API Gateway v1.0.5` from the official extension marketplace, or
-   import the copy placed on the desktop at
-   `/config/Desktop/run-api-gateway_v1.0.5_zh-cn.eext`.
-5. In Extension Manager enable **Allow external interaction** for Run API Gateway.
-6. Its menu/status should show a connection to the local bridge.
-7. Add/scan the exported MCP provider in Hermes Studio and call
-   `easyeda_status` followed by `easyeda_list_windows`.
+1. Open the app and sign in to EasyEDA inside the LPK Chromium. Cloud projects
+   belonging to that account appear directly.
+2. In EasyEDA, open **Advanced → Extension Manager** and install **Run API
+   Gateway** from the marketplace, or import the verified copy on the persistent
+   desktop: `/config/Desktop/run-api-gateway_v1.0.5_zh-cn.eext`.
+3. Enable the extension and check **Allow external interaction** and **Show in
+   top menu**.
+4. Open a schematic or PCB and choose **API Gateway → Reconnect**.
+5. In Hermes Studio, test/call the projected `easyeda` MCP provider.
 
-The whole `/config` volume is persistent, including projects, client settings,
-login state, activation file, extension settings, and desktop downloads.
+Chromium's profile, cookies, extension data and downloads persist under
+`/config`. Upgrading from v0.1.x leaves the old desktop-client data under
+`/config/LCEDA-Pro` untouched but the online Chromium login must be established
+once because browser cookies cannot be migrated safely.
 
-## MCP endpoint
+## MCP
 
-The projected, non-user-facing endpoint is:
+Canonical non-user-facing endpoint:
 
 ```text
 http://app.community.lazycat.app.easyeda-pro.lzcx/mcp
 ```
 
-The LPK exports `resources/mcp-providers/default/mcp.yml`, so a compatible
-Hermes Studio instance can discover it rather than relying on a human-facing URL.
+The LPK exports `resources/mcp-providers/default/mcp.yml`. Arbitrary JavaScript
+execution remains disabled unless an administrator explicitly sets
+`EASYEDA_ALLOW_RAW_EXECUTE=true`.
 
-### Default tools
-
-- `easyeda_status`
-- `easyeda_list_windows`
-- `easyeda_select_window`
-- `easyeda_get_project_info`
-- `easyeda_get_current_document`
-- `easyeda_list_schematics`
-- `easyeda_list_pcb_documents`
-- `easyeda_get_schematic_source`
-- `easyeda_get_pcb_source`
-- `easyeda_get_schematic_components`
-- `easyeda_get_pcb_components`
-- `easyeda_get_pcb_nets`
-- `easyeda_run_schematic_drc`
-- `easyeda_run_pcb_drc`
-- `easyeda_save_current_document`
-
-Arbitrary JavaScript execution is deliberately absent unless
-`EASYEDA_ALLOW_RAW_EXECUTE=true` is set by an administrator.
-
-## Build image
+## Build and test
 
 ```bash
-docker build --pull -t registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:3.2.186 .
-```
-
-The Dockerfile downloads the official EasyEDA Linux archive and verifies its
-pinned SHA-256. It also pins the official API Skill commit and verifies the
-Gateway release artifact.
-
-## Test locally
-
-```bash
-docker run --rm --name easyeda-test --shm-size=2g \
-  -p 3000:3000 -p 8000:8000 \
-  -e PUID=1000 -e PGID=1000 \
-  -e EASYEDA_MCP_HOST=0.0.0.0 \
-  -v easyeda-config:/config \
-  registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:3.2.186
-```
-
-Run the protocol smoke test from inside the container/network namespace:
-
-```bash
-docker cp tests/mcp-smoke.mjs easyeda-test:/tmp/mcp-smoke.mjs
-docker exec -e MCP_URL=http://127.0.0.1:8000/mcp easyeda-test \
-  node /tmp/mcp-smoke.mjs
-```
-
-## Build LPK
-
-```bash
-lzc-cli project lint .
-lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-v0.1.3.lpk
-lzc-cli lpk info dist/community.lazycat.app.easyeda-pro-v0.1.3.lpk
-lzc-cli lpk lint dist/community.lazycat.app.easyeda-pro-v0.1.3.lpk
+docker build --pull -t registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:0.2.0 .
+node tests/static-check.mjs
+npm audit --omit=dev --audit-level=high --prefix content/easyeda-mcp
+lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.2.0.lpk
 ```
 
 ## Licensing
 
-Integration code is MIT licensed. EasyEDA Pro remains proprietary and is covered
-by the included vendor EULA and Linux distribution license. See
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Integration code is MIT. The EasyEDA online editor is loaded from the vendor at
+runtime and is governed by JLCEDA's terms. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

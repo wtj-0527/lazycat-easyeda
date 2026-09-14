@@ -17,4 +17,7 @@ jobs:
       - run: npm ci --prefix content/easyeda-mcp
       - run: node --check content/easyeda-mcp/server.mjs
       - run: node tests/static-check.mjs
+      - run: sh tests/migration-check.sh
+      - run: node --check content/bridge-compat/patch-bridge.mjs
+      - run: node --check tests/bridge-handshake-retry.mjs
       - run: npm audit --omit=dev --audit-level=high --prefix content/easyeda-mcp

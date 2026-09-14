@@ -1,18 +1,18 @@
 package: community.lazycat.app.easyeda-pro
-version: 0.1.3
-name: 嘉立创EDA专业版
-description: 嘉立创EDA专业版 Linux 浏览器桌面，集成官方 API Gateway 与 Hermes Studio MCP。
-author: JLCEDA / LazyCat packaging by wtj-0527
-license: Proprietary (LCEDA EULA and Distribution License); integration code MIT
-homepage: https://lceda.cn/
+version: 0.2.0
+name: 嘉立创EDA在线版
+description: 嘉立创EDA专业版在线编辑器浏览器桌面，集成官方 API Gateway 与 Hermes Studio MCP。
+author: Community packaging by wtj-0527
+license: MIT
+homepage: https://pro.lceda.cn/editor
 min_os_version: 1.5.2
 locales:
   zh:
-    name: 嘉立创EDA专业版
-    description: 浏览器内运行的嘉立创EDA专业版，支持官方 API Gateway 与 Hermes Studio MCP。
+    name: 嘉立创EDA在线版
+    description: 浏览器内运行嘉立创EDA专业版在线编辑器，支持官方 API Gateway 与 Hermes Studio MCP。
   en:
-    name: EasyEDA Pro
-    description: EasyEDA Pro Linux browser desktop with the official API Gateway and Hermes Studio MCP integration.
+    name: EasyEDA Pro Online
+    description: EasyEDA Pro online editor in a browser desktop with the official API Gateway and Hermes Studio MCP integration.
 permissions:
   required:
     - net.internet

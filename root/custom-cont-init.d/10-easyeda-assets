@@ -1,18 +1,25 @@
 #!/usr/bin/with-contenv bash
 set -e
-install -d -o abc -g abc /config/Desktop
+install -d -o abc -g abc /config/Desktop /config/.config/openbox
+AUTOSTART=/config/.config/openbox/autostart
+ONLINE_CMD='wrapped-chromium ${CHROME_CLI}'
+if [[ ! -f "$AUTOSTART" ]]; then
+  printf '%s\n' "$ONLINE_CMD" > "$AUTOSTART"
+elif grep -q '^/opt/lceda-pro/lceda-pro ' "$AUTOSTART"; then
+  sed -i 's|^/opt/lceda-pro/lceda-pro .*$|wrapped-chromium ${CHROME_CLI}|' "$AUTOSTART"
+elif ! grep -q '^wrapped-chromium ' "$AUTOSTART"; then
+  printf '\n%s\n' "$ONLINE_CMD" >> "$AUTOSTART"
+fi
+chown abc:abc "$AUTOSTART"
 if [[ ! -f /config/Desktop/run-api-gateway_v1.0.5_zh-cn.eext ]]; then
   install -o abc -g abc -m 0644 /opt/run-api-gateway_v1.0.5_zh-cn.eext /config/Desktop/
 fi
-if [[ ! -f /config/Desktop/README-EasyEDA-MCP.txt ]]; then
-  cat > /config/Desktop/README-EasyEDA-MCP.txt <<'TXT'
-嘉立创EDA MCP 首次使用：
-1. 按官方提示完成客户端激活并登录。
-2. 在扩展管理器导入同目录的 run-api-gateway_v1.0.5_zh-cn.eext。
-3. 勾选 Run API Gateway 的“允许外部交互”。
-4. 在 Hermes Studio 调用 easyeda_status 检查连接。
-
-官方扩展：https://github.com/easyeda/eext-run-api-gateway
+cat > /config/Desktop/README-EasyEDA-MCP.txt <<'TXT'
+嘉立创EDA在线版 MCP 首次使用：
+1. 在Chromium中的嘉立创EDA登录账号，云端工程会自动显示。
+2. 打开“高级 → 扩展管理器”，导入同目录的 run-api-gateway_v1.0.5_zh-cn.eext；也可从在线扩展广场安装。
+3. 启用扩展，勾选“允许外部交互”和“显示在顶部菜单”。
+4. 打开原理图或PCB，在“API网关”菜单点“重新连接”。
+5. 在Hermes Studio调用 easyeda_status 检查连接。
 TXT
-  chown abc:abc /config/Desktop/README-EasyEDA-MCP.txt
-fi
+chown abc:abc /config/Desktop/README-EasyEDA-MCP.txt

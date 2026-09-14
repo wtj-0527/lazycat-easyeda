@@ -1,6 +1,4 @@
 import http from 'node:http';
-import { promises as fs } from 'node:fs';
-import path from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
@@ -10,8 +8,6 @@ const PORT = Number(process.env.EASYEDA_MCP_PORT || 8000);
 const BRIDGE = (process.env.EASYEDA_BRIDGE_URL || 'http://127.0.0.1:49620').replace(/\/$/, '');
 const ALLOW_RAW = /^(1|true|yes)$/i.test(process.env.EASYEDA_ALLOW_RAW_EXECUTE || 'false');
 const TIMEOUT_MS = Number(process.env.EASYEDA_REQUEST_TIMEOUT_MS || 35_000);
-const ACTIVATION_UPLOAD_PATH = process.env.EASYEDA_ACTIVATION_UPLOAD_PATH || '/config/Desktop/lceda-pro-activation.txt';
-const MAX_ACTIVATION_BYTES = 256 * 1024;
 
 const templates = Object.freeze({
   easyeda_get_project_info: 'return await eda.dmt_Project.getCurrentProjectInfo();',
@@ -57,56 +53,8 @@ function text(value, isError = false) {
 }
 
 
-function setupPage(message = '') {
-  const escaped = String(message).replace(/[&<>"']/g, character => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[character]);
-  return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>嘉立创EDA 初始化助手</title>
-<style>
-:root{font-family:Inter,"Noto Sans CJK SC",system-ui,sans-serif;color:#172033;background:#f4f7fb}body{margin:0}.wrap{max-width:760px;margin:48px auto;padding:0 20px}.card{background:#fff;border:1px solid #dce3ee;border-radius:16px;padding:28px;box-shadow:0 12px 32px #1a35651a}h1{margin:0 0 10px;font-size:26px}.sub{color:#58677e;line-height:1.7}.steps{margin:24px 0;padding-left:22px;line-height:2}.row{display:flex;gap:12px;flex-wrap:wrap}.button,button{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:9px;padding:11px 16px;background:#1677ff;color:#fff;text-decoration:none;font-weight:650;cursor:pointer}.secondary{background:#eef4ff;color:#1458b3}.upload{margin-top:24px;padding:20px;border:1px dashed #9fb2ce;border-radius:12px;background:#f9fbfe}input[type=file]{display:block;margin:12px 0;width:100%}.status{margin-top:16px;padding:12px;border-radius:8px;background:#eef8f0;color:#176b2c}.warning{margin-top:16px;padding:12px;border-radius:8px;background:#fff8e8;color:#7c5200}code{background:#edf1f6;border-radius:5px;padding:2px 5px}</style></head>
-<body><main class="wrap"><section class="card"><h1>嘉立创EDA 初始化助手</h1>
-<p class="sub">远程桌面中的嘉立创EDA是容器内的程序，不能直接唤起你电脑上的浏览器。请在这个外层页面完成官方激活文件申请，再上传到EDA的持久化桌面。</p>
-<ol class="steps"><li>在新标签打开嘉立创官方激活页面并登录。</li><li>下载官方激活文件到当前电脑。</li><li>回到此页上传文件，它会保存到EDA桌面。</li><li>回到EDA窗口，点击“导入激活文件”，选择桌面上的 <code>lceda-pro-activation.txt</code>。</li></ol>
-<div class="row"><a class="button" href="https://lceda.cn/page/desktop-client-activation" target="_blank" rel="noopener noreferrer">打开官方激活页面</a><a class="button secondary" href="/">返回EDA桌面</a></div>
-<div class="warning">激活文件包含账号许可信息，只保存在本应用的 <code>/config</code> 持久化目录，不会进入镜像、LPK或Git仓库。</div>
-<form class="upload" method="post" action="/setup/activation" enctype="application/octet-stream"><strong>上传官方激活文件</strong><input id="file" type="file" accept=".txt,text/plain,application/json" required><button type="submit">上传到EDA桌面</button></form>
-${escaped ? `<div class="status">${escaped}</div>` : ''}
-<script>document.querySelector('form').addEventListener('submit',async event=>{event.preventDefault();const file=document.querySelector('#file').files[0];if(!file)return;const response=await fetch('/setup/activation',{method:'POST',headers:{'content-type':'application/octet-stream','x-file-name':file.name},body:file});const text=await response.text();document.open();document.write(text);document.close()})</script>
-</section></main></body></html>`;
-}
-
-async function readLimitedBody(req, limit) {
-  const chunks = [];
-  let total = 0;
-  for await (const chunk of req) {
-    total += chunk.length;
-    if (total > limit) throw new Error('激活文件超过 256 KiB 限制');
-    chunks.push(chunk);
-  }
-  return Buffer.concat(chunks);
-}
-
-async function saveActivationUpload(req) {
-  const data = await readLimitedBody(req, MAX_ACTIVATION_BYTES);
-  if (!data.length) throw new Error('没有收到文件内容');
-  const text = data.toString('utf8').replace(/^\uFEFF/, '');
-  let parsed;
-  try { parsed = JSON.parse(text); } catch { throw new Error('文件不是有效的 JSON 激活文件'); }
-  const required = ['username', 'customer_code', 'email', 'phone', 'company', 'license'];
-  if (!required.every(key => Object.hasOwn(parsed, key)) || !parsed.username || !parsed.license) {
-    throw new Error('文件缺少嘉立创EDA激活字段');
-  }
-  await fs.mkdir(path.dirname(ACTIVATION_UPLOAD_PATH), { recursive: true });
-  const temporary = `${ACTIVATION_UPLOAD_PATH}.${process.pid}.tmp`;
-  await fs.writeFile(temporary, text, { mode: 0o600 });
-  await fs.rename(temporary, ACTIVATION_UPLOAD_PATH);
-  return `上传成功：请回到EDA，点击“导入激活文件”，选择桌面上的 ${path.basename(ACTIVATION_UPLOAD_PATH)}`;
-}
-
 function createMcpServer() {
-  const server = new McpServer({ name: 'lazycat-easyeda', version: '0.1.3' });
+  const server = new McpServer({ name: 'lazycat-easyeda', version: '0.2.0' });
 
   server.tool('easyeda_status', 'Check the official EasyEDA bridge and connected EasyEDA Pro windows.', {}, async () => {
     try { return text(await request('/health')); } catch (error) { return text({ connected: false, error: error.message }, true); }
@@ -165,24 +113,6 @@ function createMcpServer() {
 const httpServer = http.createServer(async (req, res) => {
   const path = new URL(req.url || '/', 'http://localhost').pathname;
   const contentType = String(req.headers['content-type'] || '').toLowerCase();
-  // LazyCat upstream routes strip their matched location prefix. Accept `/` for
-  // setup GET, activation octet-stream POST, and MCP JSON POST accordingly.
-  if (req.method === 'GET' && (path === '/' || path === '/setup' || path === '/setup/')) {
-    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-    res.end(setupPage());
-    return;
-  }
-  if (req.method === 'POST' && (path === '/setup/activation' || (path === '/' && contentType.startsWith('application/octet-stream')))) {
-    try {
-      const message = await saveActivationUpload(req);
-      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-      res.end(setupPage(message));
-    } catch (error) {
-      res.writeHead(400, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
-      res.end(setupPage(`上传失败：${error.message}`));
-    }
-    return;
-  }
   if (req.method === 'GET' && path === '/healthz') {
     try {
       const bridge = await request('/health');

@@ -1,17 +1,11 @@
 usage: |
-  嘉立创EDA专业版通过浏览器远程桌面运行。首次使用请登录嘉立创账号，并在扩展管理器中安装/启用官方 Run API Gateway、勾选“允许外部交互”。
-  工程、登录状态与设置保存在 /config。MCP 端点仅供应用间调用。
+  嘉立创EDA专业版在线编辑器运行在LPK内的Chromium浏览器桌面中。首次使用请登录嘉立创账号，并在扩展管理器安装/启用官方 Run API Gateway、勾选“允许外部交互”。
+  Chromium登录态和下载保存在 /config；MCP端点仅供LazyCat应用间调用。
 application:
   subdomain: easyeda
   multi_instance: true
   gpu_accel: true
   upstreams:
-    - location: /setup/activation
-      backend: http://easyeda:8000/setup/activation
-      disable_auto_health_checking: true
-    - location: /setup
-      backend: http://easyeda:8000/setup
-      disable_auto_health_checking: true
     - location: /mcp
       backend: http://easyeda:8000/
       disable_auto_health_checking: true
@@ -22,16 +16,20 @@ application:
       backend: http://easyeda:3000/
 services:
   easyeda:
-    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:d3bc2cd88f8ed96602a6484d8e580445512f1c84483a4ae73d205b739b7458ae
+    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:d4e3dc07cfefc96987ac2c79997fcb24d73929668e027f6aef3c4fed1081ece1
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Shanghai
       - LC_ALL=zh_CN.UTF-8
-      - TITLE=嘉立创EDA专业版
-      - AUTO_GPU=true
+      - TITLE=嘉立创EDA在线版
+      - PIXELFLUX_WAYLAND=false
+      - CHROME_CLI=https://pro.lceda.cn/editor
       - SELKIES_IS_MANUAL_RESOLUTION_MODE=false|locked
       - SELKIES_USE_CSS_SCALING=true|locked
+      - SELKIES_COMMAND_ENABLED=false|locked
+      - SELKIES_ENABLE_SHARING=false|locked
+      - SELKIES_UI_SIDEBAR_SHOW_APPS=false|locked
       - EASYEDA_BRIDGE_URL=http://127.0.0.1:49620
       - EASYEDA_MCP_HOST=0.0.0.0
       - EASYEDA_MCP_PORT=8000
