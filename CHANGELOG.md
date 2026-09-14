@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 — 2026-09-14
+
+- Fix schematic state inspection to return component pins, coordinates, nets,
+  rotation, and intentional no-connect state.
+- Add `easyeda_set_schematic_pin_no_connect` for marking unused component pins
+  through the official component-pin `done()` workflow.
+
 ## 0.3.0 — 2026-09-14
 
 - Upgrade from inspection MCP to full design MCP with 70 tools.

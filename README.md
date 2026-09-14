@@ -52,10 +52,10 @@ execution remains disabled unless an administrator explicitly sets
 ## Build and test
 
 ```bash
-docker build --pull -t registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:0.2.0 .
+docker build --pull -t registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:0.3.1 .
 node tests/static-check.mjs
 npm audit --omit=dev --audit-level=high --prefix content/easyeda-mcp
-lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.3.0.lpk
+lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.3.1.lpk
 ```
 
 ## Licensing
@@ -65,7 +65,7 @@ runtime and is governed by JLCEDA's terms. See [THIRD_PARTY_NOTICES.md](THIRD_PA
 
 ## Design MCP safety
 
-The v0.3 API exposes 70 tools, including structured schematic/PCB actions and a
+The v0.3.1 API exposes 71 tools, including structured schematic/PCB actions and a
 generic `easyeda_call_api(module, method, args)` dispatcher for complete public
 `eda.*` API coverage. It does not accept JavaScript source. Writes require
 `confirmWrite: true` and the currently active `expectedProjectUuid`; destructive
