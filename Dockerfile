@@ -7,6 +7,7 @@ ARG RUN_API_GATEWAY_URL=https://github.com/easyeda/eext-run-api-gateway/releases
 ARG RUN_API_GATEWAY_SHA256=2a97471b76cd274eb1151559949d47ad8940a57b3044c4291eeb22e0935e196a
 LABEL org.opencontainers.image.source="https://github.com/wtj-0527/lazycat-easyeda" \
       org.opencontainers.image.licenses="LicenseRef-LCEDA-Distribution-License AND MIT"
+COPY content/bridge-compat/patch-bridge.mjs /tmp/patch-bridge.mjs
 ENV TITLE="嘉立创EDA专业版" NO_GAMEPAD=true PIXELFLUX_WAYLAND=false
 RUN apt-get update && apt-get install --no-install-recommends -y \
     curl unzip git nodejs libgtk-3-0 libnss3 libasound2t64 libsecret-1-0 \
@@ -17,6 +18,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     mv /tmp/easyeda/lceda-pro /opt/lceda-pro && chmod 0755 /opt/lceda-pro/lceda-pro /opt/lceda-pro/chrome_crashpad_handler && \
     git clone https://github.com/easyeda/easyeda-api-skill.git /opt/easyeda-api-skill && \
     cd /opt/easyeda-api-skill && git checkout "${EASYEDA_API_SKILL_COMMIT}" && npm ci --omit=dev && \
+    node /tmp/patch-bridge.mjs /opt/easyeda-api-skill/scripts/bridge-server.mjs && rm /tmp/patch-bridge.mjs && \
     curl -fL "${RUN_API_GATEWAY_URL}" -o /opt/run-api-gateway_v1.0.5_zh-cn.eext && \
     echo "${RUN_API_GATEWAY_SHA256}  /opt/run-api-gateway_v1.0.5_zh-cn.eext" | sha256sum -c - && \
     rm -rf /opt/easyeda-api-skill/.git /tmp/easyeda.zip /tmp/easyeda /var/lib/apt/lists/*

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3 — 2026-09-14
+
+- Retry the official Bridge handshake until an EasyEDA window registers.
+- Work around the EasyEDA 3.2.x WebSocket callback-readiness race without changing the Gateway protocol.
+
+## 0.1.2 — 2026-09-14
+
+- Fix LazyCat upstream prefix stripping for `/setup`, activation upload, and `/mcp`.
+- Test both direct service paths and stripped-prefix application routes.
+
 ## 0.1.1 — 2026-09-14
 
 - Add an outer-browser setup page at `/setup`.

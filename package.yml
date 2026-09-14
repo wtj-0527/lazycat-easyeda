@@ -1,5 +1,5 @@
 package: community.lazycat.app.easyeda-pro
-version: 0.1.1
+version: 0.1.3
 name: 嘉立创EDA专业版
 description: 嘉立创EDA专业版 Linux 浏览器桌面，集成官方 API Gateway 与 Hermes Studio MCP。
 author: JLCEDA / LazyCat packaging by wtj-0527

@@ -106,7 +106,7 @@ async function saveActivationUpload(req) {
 }
 
 function createMcpServer() {
-  const server = new McpServer({ name: 'lazycat-easyeda', version: '0.1.1' });
+  const server = new McpServer({ name: 'lazycat-easyeda', version: '0.1.3' });
 
   server.tool('easyeda_status', 'Check the official EasyEDA bridge and connected EasyEDA Pro windows.', {}, async () => {
     try { return text(await request('/health')); } catch (error) { return text({ connected: false, error: error.message }, true); }
@@ -164,12 +164,15 @@ function createMcpServer() {
 
 const httpServer = http.createServer(async (req, res) => {
   const path = new URL(req.url || '/', 'http://localhost').pathname;
-  if (req.method === 'GET' && (path === '/setup' || path === '/setup/')) {
+  const contentType = String(req.headers['content-type'] || '').toLowerCase();
+  // LazyCat upstream routes strip their matched location prefix. Accept `/` for
+  // setup GET, activation octet-stream POST, and MCP JSON POST accordingly.
+  if (req.method === 'GET' && (path === '/' || path === '/setup' || path === '/setup/')) {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
     res.end(setupPage());
     return;
   }
-  if (req.method === 'POST' && path === '/setup/activation') {
+  if (req.method === 'POST' && (path === '/setup/activation' || (path === '/' && contentType.startsWith('application/octet-stream')))) {
     try {
       const message = await saveActivationUpload(req);
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' });
@@ -191,7 +194,8 @@ const httpServer = http.createServer(async (req, res) => {
     }
     return;
   }
-  if (path !== '/mcp' || req.method !== 'POST') {
+  const isMcpPost = req.method === 'POST' && (path === '/mcp' || (path === '/' && contentType.includes('application/json')));
+  if (!isMcpPost) {
     res.writeHead(405, { allow: 'POST', 'content-type': 'application/json' });
     res.end(JSON.stringify({ error: 'Use POST /mcp' }));
     return;

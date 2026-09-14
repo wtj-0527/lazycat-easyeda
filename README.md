@@ -106,9 +106,9 @@ docker exec -e MCP_URL=http://127.0.0.1:8000/mcp easyeda-test \
 
 ```bash
 lzc-cli project lint .
-lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-v0.1.1.lpk
-lzc-cli lpk info dist/community.lazycat.app.easyeda-pro-v0.1.1.lpk
-lzc-cli lpk lint dist/community.lazycat.app.easyeda-pro-v0.1.1.lpk
+lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-v0.1.3.lpk
+lzc-cli lpk info dist/community.lazycat.app.easyeda-pro-v0.1.3.lpk
+lzc-cli lpk lint dist/community.lazycat.app.easyeda-pro-v0.1.3.lpk
 ```
 
 ## Licensing
