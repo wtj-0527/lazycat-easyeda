@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 — 2026-09-14
+
+- Add structured PCB component-pin inspection and safe component-property
+  modification tools.
+- Add a project-bound PCB pad-net assignment tool.
+- Add an explicitly confirmed PCB component deletion tool.
+- Add project-bound ratline recalculation after footprint and routing changes.
+
 ## 0.3.1 — 2026-09-14
 
 - Fix schematic state inspection to return component pins, coordinates, nets,

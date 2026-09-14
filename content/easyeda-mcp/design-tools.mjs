@@ -142,6 +142,35 @@ export function registerDesignTools(server, { execute, runWrite, getProjectUuid,
   }catch(error){return text({error:error.message},true);}});
   server.tool('easyeda_delete_schematic_primitives', 'Delete schematic components/wires by type and IDs.', { primitiveType:z.enum(['component','wire']),primitiveIds:z.array(z.string()).min(1),...destructive }, async i=>{try{const mod=i.primitiveType==='wire'?'sch_PrimitiveWire':'sch_PrimitiveComponent';return text(await runWrite({...i,destructive:true},()=>execute(`return await eda.${mod}.delete(${safeJson(i.primitiveIds)});`,i.windowId)));}catch(error){return text({error:error.message},true);}});
 
+  server.tool('easyeda_get_pcb_component_pins', 'Read all pads/pins belonging to a PCB component primitive.', {
+    componentPrimitiveId:z.string().min(1), ...windowArg,
+  }, async i=>{try{return text(await execute(`return await eda.pcb_PrimitiveComponent.getAllPinsByPrimitiveId(${safeJson(i.componentPrimitiveId)});`,i.windowId));}catch(error){return text({error:error.message},true);}});
+
+  const pcbComponentProperties = z.object({
+    designator:z.string().min(1).optional(),
+    uniqueId:z.string().optional(),
+    x:z.number().optional(),
+    y:z.number().optional(),
+    rotation:z.number().optional(),
+    primitiveLock:z.boolean().optional(),
+    addIntoBom:z.boolean().optional(),
+  }).refine(value=>Object.keys(value).length>0,{message:'At least one PCB component property is required.'});
+  server.tool('easyeda_modify_pcb_component', 'Modify safe structured properties of a PCB component.', {
+    componentPrimitiveId:z.string().min(1), properties:pcbComponentProperties, ...commonWrite,
+  }, async i=>{try{return text(await runWrite(i,()=>execute(`return await eda.pcb_PrimitiveComponent.modify(${safeJson(i.componentPrimitiveId)},${safeJson(i.properties)});`,i.windowId)));}catch(error){return text({error:error.message},true);}});
+
+  server.tool('easyeda_set_pcb_pad_net', 'Assign or clear the net of a PCB pad primitive.', {
+    padPrimitiveId:z.string().min(1), net:z.string(), ...commonWrite,
+  }, async i=>{try{return text(await runWrite(i,()=>execute(`return await eda.pcb_PrimitivePad.modify(${safeJson(i.padPrimitiveId)},{net:${safeJson(i.net)}});`,i.windowId)));}catch(error){return text({error:error.message},true);}});
+
+  server.tool('easyeda_delete_pcb_components', 'Delete PCB components by primitive ID.', {
+    componentPrimitiveIds:z.array(z.string().min(1)).min(1), ...destructive,
+  }, async i=>{try{return text(await runWrite({...i,destructive:true},()=>execute(`return await eda.pcb_PrimitiveComponent.delete(${safeJson(i.componentPrimitiveIds)});`,i.windowId)));}catch(error){return text({error:error.message},true);}});
+
+  server.tool('easyeda_recalculate_ratlines', 'Recalculate PCB ratlines after component, pad-net, or routing changes.', {
+    ...commonWrite,
+  }, async i=>{try{return text(await runWrite(i,()=>execute('return await eda.pcb_Document.startCalculatingRatline();',i.windowId)));}catch(error){return text({error:error.message},true);}});
+
   server.tool('easyeda_import_project', 'Import a complete EasyEDA/KiCad/Altium/etc project file. Import always has an explicit destination and undefined results are errors; it does not merge primitives into the currently open sheet.', {
     filePath:z.string().optional().describe('Preferred: path under /config/Desktop or /config/Downloads.'),fileName:z.string().optional(),fileBase64:z.string().max(1_500_000).optional().describe('Only for small files; use filePath for normal projects.'),mimeType:z.string().optional(),
     fileType:z.enum(['JLCEDA','JLCEDA Pro','EasyEDA','EasyEDA Pro','Allegro','OrCAD','EAGLE','KiCad','PADS','LTspice','Altium Designer','Protel']),
