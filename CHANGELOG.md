@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 — 2026-09-14
+
+- Upgrade from inspection MCP to full design MCP with 70 tools.
+- Add 32 structured PCB/schematic actions plus document/project CRUD, validated library search/placement, import/export, and generic public API dispatch.
+- Use the supported manufacture-data API for netlists instead of the removed `sch_Netlist.getNetlist()` API.
+- Require explicit import destinations and reject undefined import/create results instead of reporting false success.
+- Require project UUID binding and explicit confirmation for writes; destructive actions require a fixed confirmation phrase.
+- Serialize writes and keep arbitrary JavaScript execution disabled by default.
+- Restrict project files to persistent Desktop/Downloads paths, cap at 100 MiB, and return export SHA-256 metadata.
+
 ## 0.2.1 — 2026-09-14
 
 - Remove the redundant bundled Gateway artifact; install it directly from the official online extension marketplace.

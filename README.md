@@ -1,7 +1,7 @@
 # EasyEDA Pro Online for LazyCat Microserver
 
 An all-in-one LazyCat LPK that opens the official **嘉立创EDA专业版在线编辑器**
-in an isolated Chromium browser desktop and exposes a constrained Streamable
+in an isolated Chromium browser desktop and exposes a full design-capable Streamable
 HTTP MCP endpoint to Hermes Studio.
 
 > Independent community packaging. EasyEDA/JLCEDA is a product and online
@@ -55,10 +55,20 @@ execution remains disabled unless an administrator explicitly sets
 docker build --pull -t registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:0.2.0 .
 node tests/static-check.mjs
 npm audit --omit=dev --audit-level=high --prefix content/easyeda-mcp
-lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.2.1.lpk
+lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.3.0.lpk
 ```
 
 ## Licensing
 
 Integration code is MIT. The EasyEDA online editor is loaded from the vendor at
 runtime and is governed by JLCEDA's terms. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Design MCP safety
+
+The v0.3 API exposes 70 tools, including structured schematic/PCB actions and a
+generic `easyeda_call_api(module, method, args)` dispatcher for complete public
+`eda.*` API coverage. It does not accept JavaScript source. Writes require
+`confirmWrite: true` and the currently active `expectedProjectUuid`; destructive
+methods additionally require `CONFIRM DESTRUCTIVE EASYEDA OPERATION`. Writes are
+serialized server-side. Import/export files are confined to `/config/Desktop` or
+`/config/Downloads`.

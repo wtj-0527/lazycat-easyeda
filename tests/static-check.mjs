@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+const designTools = fs.readFileSync(new URL('../content/easyeda-mcp/design-tools.mjs', import.meta.url), 'utf8');
 const server = fs.readFileSync(new URL('../content/easyeda-mcp/server.mjs', import.meta.url), 'utf8');
 const manifest = fs.readFileSync(new URL('../lzc-manifest.yml', import.meta.url), 'utf8');
 const dockerfile = fs.readFileSync(new URL('../Dockerfile', import.meta.url), 'utf8');
@@ -7,6 +8,14 @@ const buildConfig = fs.readFileSync(new URL('../lzc-build.yml', import.meta.url)
 const provider = fs.readFileSync(new URL('../resources/mcp-providers/default/mcp.yml', import.meta.url), 'utf8');
 assert.match(server, /EASYEDA_ALLOW_RAW_EXECUTE/);
 assert.match(server, /if \(ALLOW_RAW\)/);
+assert.match(designTools, /easyeda_call_api/);
+assert.match(designTools, /easyeda_search_library_components/);
+assert.match(designTools, /extractProjectInfo/);
+assert.match(designTools, /import returned undefined/);
+assert.match(designTools, /component create returned undefined/);
+assert.match(designTools, /expectedProjectUuid/);
+assert.match(designTools, /CONFIRM DESTRUCTIVE EASYEDA OPERATION/);
+assert.doesNotMatch(designTools, /new AsyncFunction|eval\(/);
 assert.doesNotMatch(server, /ACTIVATION_UPLOAD|saveActivationUpload|setupPage/);
 assert.match(manifest, /EASYEDA_ALLOW_RAW_EXECUTE=false/);
 assert.match(manifest, /CHROME_CLI=https:\/\/pro\.lceda\.cn\/editor/);

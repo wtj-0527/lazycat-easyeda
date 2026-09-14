@@ -23,6 +23,13 @@ proprietary desktop client.
 - Installed by the user from the official EasyEDA extension marketplace at runtime.
 - License: Apache-2.0
 
+## JLCEDA action templates
+
+- Derived from: https://github.com/hyl64/jlcmcp
+- Pinned source commit: `5e53ddaa07e1763de6c1b17a82aafa2cb1476d4b`
+- License: MIT
+- Scope: structured action-to-official-API templates in `content/easyeda-mcp/vendor/`
+
 ## LinuxServer.io Chromium image
 
 - Image: `lscr.io/linuxserver/chromium`

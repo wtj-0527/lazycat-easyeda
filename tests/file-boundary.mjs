@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const source=fs.readFileSync(new URL('../content/easyeda-mcp/server.mjs',import.meta.url),'utf8');
+const design=fs.readFileSync(new URL('../content/easyeda-mcp/design-tools.mjs',import.meta.url),'utf8');
+assert.match(source,/DATA_ROOTS = \['\/config\/Desktop', '\/config\/Downloads'\]/);
+assert.match(source,/MAX_PROJECT_FILE_BYTES = 100 \* 1024 \* 1024/);
+assert.match(source,/createHash\('sha256'\)/);
+assert.match(design,/use filePath for normal projects/);
+assert.match(design,/returns path, size and SHA-256, not base64/);
+assert.match(design, /delete\|remove\|clear\|overwrite\|reset/);
+console.log('file, export and generic API safety boundaries: PASS');
