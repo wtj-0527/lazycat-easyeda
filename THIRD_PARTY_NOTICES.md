@@ -20,8 +20,7 @@ proprietary desktop client.
 ## Run API Gateway
 
 - Source: https://github.com/easyeda/eext-run-api-gateway
-- Release: v1.0.5
-- SHA-256: `2a97471b76cd274eb1151559949d47ad8940a57b3044c4291eeb22e0935e196a`
+- Installed by the user from the official EasyEDA extension marketplace at runtime.
 - License: Apache-2.0
 
 ## LinuxServer.io Chromium image

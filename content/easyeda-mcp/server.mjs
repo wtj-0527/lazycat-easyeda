@@ -54,7 +54,7 @@ function text(value, isError = false) {
 
 
 function createMcpServer() {
-  const server = new McpServer({ name: 'lazycat-easyeda', version: '0.2.0' });
+  const server = new McpServer({ name: 'lazycat-easyeda', version: '0.2.1' });
 
   server.tool('easyeda_status', 'Check the official EasyEDA bridge and connected EasyEDA Pro windows.', {}, async () => {
     try { return text(await request('/health')); } catch (error) { return text({ connected: false, error: error.message }, true); }

@@ -16,7 +16,7 @@ application:
       backend: http://easyeda:3000/
 services:
   easyeda:
-    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:d4e3dc07cfefc96987ac2c79997fcb24d73929668e027f6aef3c4fed1081ece1
+    image: registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda@sha256:8d93553ff5566514c0cdc8383a92c3802b8214f0fb4370c289cdc292b1c76d29
     environment:
       - PUID=1000
       - PGID=1000

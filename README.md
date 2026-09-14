@@ -26,8 +26,7 @@ No EasyEDA desktop binary or activation flow is included.
 1. Open the app and sign in to EasyEDA inside the LPK Chromium. Cloud projects
    belonging to that account appear directly.
 2. In EasyEDA, open **Advanced → Extension Manager** and install **Run API
-   Gateway** from the marketplace, or import the verified copy on the persistent
-   desktop: `/config/Desktop/run-api-gateway_v1.0.5_zh-cn.eext`.
+   Gateway** from the official extension marketplace.
 3. Enable the extension and check **Allow external interaction** and **Show in
    top menu**.
 4. Open a schematic or PCB and choose **API Gateway → Reconnect**.
@@ -56,7 +55,7 @@ execution remains disabled unless an administrator explicitly sets
 docker build --pull -t registry.cn-shanghai.aliyuncs.com/wtjking/lazycat-easyeda:0.2.0 .
 node tests/static-check.mjs
 npm audit --omit=dev --audit-level=high --prefix content/easyeda-mcp
-lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.2.0.lpk
+lzc-cli project release -o dist/community.lazycat.app.easyeda-pro-online-v0.2.1.lpk
 ```
 
 ## Licensing

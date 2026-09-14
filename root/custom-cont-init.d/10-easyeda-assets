@@ -11,13 +11,10 @@ elif ! grep -q '^wrapped-chromium ' "$AUTOSTART"; then
   printf '\n%s\n' "$ONLINE_CMD" >> "$AUTOSTART"
 fi
 chown abc:abc "$AUTOSTART"
-if [[ ! -f /config/Desktop/run-api-gateway_v1.0.5_zh-cn.eext ]]; then
-  install -o abc -g abc -m 0644 /opt/run-api-gateway_v1.0.5_zh-cn.eext /config/Desktop/
-fi
 cat > /config/Desktop/README-EasyEDA-MCP.txt <<'TXT'
 嘉立创EDA在线版 MCP 首次使用：
 1. 在Chromium中的嘉立创EDA登录账号，云端工程会自动显示。
-2. 打开“高级 → 扩展管理器”，导入同目录的 run-api-gateway_v1.0.5_zh-cn.eext；也可从在线扩展广场安装。
+2. 打开“高级 → 扩展管理器 → 扩展广场”，搜索并安装官方 Run API Gateway。
 3. 启用扩展，勾选“允许外部交互”和“显示在顶部菜单”。
 4. 打开原理图或PCB，在“API网关”菜单点“重新连接”。
 5. 在Hermes Studio调用 easyeda_status 检查连接。

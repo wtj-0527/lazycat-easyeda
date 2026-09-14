@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 — 2026-09-14
+
+- Remove the redundant bundled Gateway artifact; install it directly from the official online extension marketplace.
+- Keep the validated Chromium profile, account login, extension and permissions persistent in `/config`.
+
 ## 0.2.0 — 2026-09-14
 
 - Replace the proprietary Linux desktop client with Chromium loading the official EasyEDA Pro online editor.

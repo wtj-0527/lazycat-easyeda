@@ -11,15 +11,11 @@ COPY content/easyeda-mcp /opt/easyeda-mcp
 RUN cd /opt/easyeda-mcp && npm ci --omit=dev && npm cache clean --force
 
 FROM lscr.io/linuxserver/chromium@sha256:54a61718733c82ac041e7c84543283419b06ab0d6439eef5c20b1f6a53b8dcd0
-ARG RUN_API_GATEWAY_URL=https://github.com/easyeda/eext-run-api-gateway/releases/download/v1.0.5/run-api-gateway_v1.0.5_zh-cn.eext
-ARG RUN_API_GATEWAY_SHA256=2a97471b76cd274eb1151559949d47ad8940a57b3044c4291eeb22e0935e196a
 LABEL org.opencontainers.image.source="https://github.com/wtj-0527/lazycat-easyeda" \
       org.opencontainers.image.licenses="MIT"
 COPY --from=integration /usr/local/bin/node /usr/local/bin/node
 COPY --from=integration /opt/easyeda-api-skill /opt/easyeda-api-skill
 COPY --from=integration /opt/easyeda-mcp /opt/easyeda-mcp
-RUN curl -fL "${RUN_API_GATEWAY_URL}" -o /opt/run-api-gateway_v1.0.5_zh-cn.eext && \
-    echo "${RUN_API_GATEWAY_SHA256}  /opt/run-api-gateway_v1.0.5_zh-cn.eext" | sha256sum -c -
 COPY root/ /
 RUN chmod +x /custom-cont-init.d/10-easyeda-assets \
     /etc/s6-overlay/s6-rc.d/svc-easyeda-bridge/run \

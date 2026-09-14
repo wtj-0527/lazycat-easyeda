@@ -1,5 +1,5 @@
 package: community.lazycat.app.easyeda-pro
-version: 0.2.0
+version: 0.2.1
 name: 嘉立创EDA在线版
 description: 嘉立创EDA专业版在线编辑器浏览器桌面，集成官方 API Gateway 与 Hermes Studio MCP。
 author: Community packaging by wtj-0527
